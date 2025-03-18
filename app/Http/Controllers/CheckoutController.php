@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Address;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Checkout;
@@ -17,17 +18,41 @@ class CheckoutController extends Controller
     public function index(Request $request)
     {
         $product = Product::findorfail($request->product_id);
-        // dd($product->price);
 
-        return view('checkout.index', ['product' => $product]);
+        $addresses = Address::where('user_id',Auth::id())->get();
+        // dd($addresses);
+
+        return view('checkout.index', ['product' => $product,'addresses'=>$addresses]);
     }
 
     public function  store(Request $request)
     {
-        // dd($request->all());
-
+        
+        if($request->address=='on'){
+            dd('hi');
+        }
+        dd($request->all());
+        
         $user_id = auth()->user()->id;
-
+        
+        $validatedData = $request->validate([
+            'address' =>['required'],
+            'name' => ['required'],
+            'mobile' => ['required', 'min:10'],
+            'pincode' => ['required'],
+            'locality' => ['required'],
+            'address' => ['required'],
+            'city' => ['required'],
+            'district' => ['required'],
+            'state' => ['required'],
+        ]);
+        
+        // Inject user_id directly
+        $validatedData['user_id'] = $user_id;
+        
+        Address::create($validatedData);
+        
+        
         // $order_id = $request->id;
 
         $order = Checkout::create([

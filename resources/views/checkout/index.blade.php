@@ -4,8 +4,8 @@
 
     <section class="max-w-[1000px] flex gap-6">
         @if (session('success'))
-            <h2 class="bg-green-500 p-2 text-white">{{session('success')}}</h2>
-            
+        <h2 class="bg-green-500 p-2 text-white">{{session('success')}}</h2>
+
         @endif
         <!-- Left Side (Scrollable Content) -->
         <section class="flex-1 max-w-[700px] mt-4 p-4 grid gap-10 overflow-auto">
@@ -26,39 +26,74 @@
                 <p class="text-lg mt-2 font-light text-black/60">{{auth()->user()->number}}</p>
                 @endauth
             </div>
-    
+
             <div class="flex flex-col gap-4 p-6 bg-white shadow-lg rounded-sm">
                 <h2 class="text-gray-800 font-bold text-2xl">Shipping Address</h2>
+                @if ($addresses)
+                <div class="shadow-md p-4">
+                    @foreach ($addresses as $address)
+                    <div>
+                        <div class="flex justify-between">
+                            <div>
+                                <span class="text-gray-700 text-lg font-semibold">{{$address->name}}</span><br>
+                                <span class="text-gray-700 text-sm font-semibold">Phone Number:
+                                    {{$address->mobile}}</span>
+                                <p>{{$address->address}},{{$address->city}},{{$address->state}},
+                                    <span class="font-bold">{{$address->pincode}}</span>
+                                </p>
+                            </div>
+                            <div>
+                                <button class="bg-gray-200 px-4 py-1 shadow-sm" id="changebutton">Change</button>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    @endforeach
+                </div>
+
+                @endif
+
                 <form action="{{route('checkout.store')}}" method="POST" class="flex flex-col max-w-[800px] gap-4">
                     @csrf
+                    <div class="bg-orange-500 text-white py-2 px-4 mt-2 cursor-pointer" id="addressbutton">
+
+                        <input type="checkbox" name="address">Select This Address
+                    </div>
                     <input type="hidden" name="product_id" value="{{$product->id}}">
                     <input type="hidden" name="quantity" value="1">
                     <input type="hidden" name="price" value="{{$product->sale_price}}">
+                    @if (empty($addresses))
+
+
                     <div class="flex gap-4">
                         <x-forminput for="name" name="name"></x-forminput>
                         <x-forminput for="mobile" name="mobile" type="number"></x-forminput>
                     </div>
-    
+
                     <div class="flex gap-4">
                         <x-forminput for="pincode" name="pincode" type="number"></x-forminput>
                         <x-forminput for="locality" name="locality"></x-forminput>
                     </div>
-    
+
                     <x-forminput for="address" name="address"></x-forminput>
-    
+
                     <div class="flex gap-4">
                         <x-forminput for="city" name="city"></x-forminput>
+                        <x-forminput for="city" name="district"></x-forminput>
                         <x-forminput for="state" name="state"></x-forminput>
                     </div>
-    
+
+                    @endif
+
                     <button type="submit" name="submit"
-                        class="bg-orange-600 w-1/3 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-sm shadow-md transition-all">
+                        class="bg-blue-600 w-1/3 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-sm shadow-md transition-all">
                         Proceed to Checkout
                     </button>
                 </form>
             </div>
         </section>
-    
+
         <!-- Right Side (Fixed Price Details) -->
         <section class="mt-4 p-6 bg-white shadow-md rounded-sm w-[350px] fixed right-10 top-24">
             <h2 class="text-gray-800 font-bold border-b pb-2 border-gray-300 uppercase tracking-wide">
@@ -70,7 +105,7 @@
                     <span>Price (1 item):</span>
                     <span class="font-semibold">₹{{ number_format($product->sale_price, 2) }}</span>
                 </div>
-    
+
                 <!-- Total Amount -->
                 <div class="flex justify-between text-xl font-bold text-black">
                     <span>Total Payable:</span>
@@ -79,7 +114,15 @@
             </div>
         </section>
     </section>
-    
+
 
 
 </x-layout>
+
+<script>
+    const btn =  document.querySelector('#addressbutton')
+   btn.addEventListener('click',()=>{
+    console.log('hi');
+    
+   })
+</script>
